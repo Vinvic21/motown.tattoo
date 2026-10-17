@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
@@ -10,7 +10,15 @@ import Book from './pages/Book.jsx';
 
 export default function App() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo(0, 0), [pathname]);
+
+  // Jump to the top instantly on every page change (no smooth scroll),
+  // so the new page's sections are in view and reveal straight away.
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    root.style.scrollBehavior = '';
+  }, [pathname]);
 
   return (
     <>

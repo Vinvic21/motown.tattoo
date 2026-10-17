@@ -7,11 +7,20 @@ export default function Reveal({ as: Tag = 'div', delay = 0, className = '', chi
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
+
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce || !('IntersectionObserver' in window)) {
       setShown(true);
       return undefined;
     }
+
+    // Anything already on screen when it mounts is shown right away.
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setShown(true);
+      return undefined;
+    }
+
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -26,7 +35,12 @@ export default function Reveal({ as: Tag = 'div', delay = 0, className = '', chi
   }, []);
 
   return (
-    <Tag ref={ref} className={`reveal ${shown ? 'is-in' : ''} ${className}`} style={{ '--d': `${delay}ms` }} {...rest}>
+    <Tag
+      ref={ref}
+      className={`reveal ${shown ? 'is-in' : ''} ${className}`}
+      style={{ '--d': `${delay}ms` }}
+      {...rest}
+    >
       {children}
     </Tag>
   );
